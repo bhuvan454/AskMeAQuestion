@@ -32,10 +32,10 @@ To execute the crawler use to following command.
 python crawler.py --start_year 2020 --end_year 2021 --output_dir './data/' --type 'all'
 ```
 Arguments for the crawler:
---start_year: The starting year of the conference papers you want to download (default is 1987).
---end_year: The ending year of the conference papers you want to download (default is the latest year available).
---output_dir: The directory where the data will be saved (default is data).
---type: To download the specific data type., it takes 'metadata', 'pdf', 'abstract', 'all' as inputs (default is all)
+* --start_year: The starting year of the conference papers you want to download (default is 1987).
+* --end_year: The ending year of the conference papers you want to download (default is the latest year available).
+* --output_dir: The directory where the data will be saved (default is data).
+* --type: To download the specific data type., it takes 'metadata', 'pdf', 'abstract', 'all' as inputs (default is all)
 
 
 ## Notes
