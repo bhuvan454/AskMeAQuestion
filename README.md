@@ -26,7 +26,7 @@ pip install -r requirements.txt
 ```
 
 ## Usage
-To execute the crawler use to following command.
+To execute the crawler use the following command.
 
 ```bash
 python crawler.py --start_year 2020 --end_year 2021 --output_dir './data/' --type 'all'
