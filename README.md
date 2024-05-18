@@ -4,7 +4,7 @@ This project is designed to curate the research papers for the language models, 
 summaries, and PDFs for either a given year or a specific range of years. 
 
 
-
+```bash
 project_root/
 ├── data
 │   ├── 2021
@@ -17,6 +17,7 @@ project_root/
 ├── notebooks
 ├── main.py
 ├── Readme.md
+```
 
 
 
