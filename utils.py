@@ -6,7 +6,7 @@ import aiohttp
 import asyncio
 from bs4 import BeautifulSoup
 from tqdm.asyncio import tqdm
-
+from tenacity import retry, stop_after_attempt, wait_fixed, retry_if_exception_type
 
 
 
@@ -21,6 +21,8 @@ base_url = "https://papers.nips.cc"
 
 
 ############################################## Fetching Functions ##############################################################
+
+@retry(retry=retry_if_exception_type(aiohttp.ClientError), stop=stop_after_attempt(3), wait=wait_fixed(2))
 async def fetch(session, url):
     try:
         async with session.get(url, headers=default_headers) as response:
@@ -30,9 +32,9 @@ async def fetch(session, url):
         print(f"Error fetching {url}: {e}")
         return None
 
-# async def fetch_all(session, urls):
-#     tasks = [fetch(session, url) for url in urls]
-#     return await asyncio.gather(*tasks)
+async def fetch_all(session, urls):
+    tasks = [fetch(session, url) for url in urls]
+    return await asyncio.gather(*tasks)
 
 
 ############################################## Helper Functions ##############################################################
@@ -101,12 +103,15 @@ def check_args(args):
 
 
 ############################################# Fetch, Save and Download Functions #############################################
+@retry(retry=retry_if_exception_type(aiohttp.ClientError), stop=stop_after_attempt(3), wait=wait_fixed(2))
 async def get_metadata(session, meta_path):
     async with session.get(meta_path) as response:
-        if response.status_code != 200:
+    
+        if response.status != 200: # 200 is the status code for successful HTTP requests
             return {}
         return await response.json()
 
+@retry(retry=retry_if_exception_type(aiohttp.ClientError), stop=stop_after_attempt(3), wait=wait_fixed(2))
 async def get_pdf(session, pdf_path):
     try:
         async with session.get(pdf_path) as response:
@@ -115,10 +120,10 @@ async def get_pdf(session, pdf_path):
     except Exception as e:
         print(f"Error downloading PDF from {pdf_path}: {e}")
         return None
-
+@retry(retry=retry_if_exception_type(aiohttp.ClientError), stop=stop_after_attempt(3), wait=wait_fixed(2))
 async def get_abstract(session, abstract_path):
     async with session.get(abstract_path) as response:
-        if response.status_code != 200:
+        if response.status != 200: 
             return ""
         soup = BeautifulSoup(await response.text(), "html.parser")
         abstract_text = soup.find('h4', string='Abstract').find_next('p').get_text()
@@ -160,6 +165,7 @@ async def download_papers_for_year(session, year, output_dir, download_type, ver
             with open(os.path.join(save_dir, f"{paper_id}_abstract.json"), "w") as f:
                 json.dump(abstract, f, indent=4)
 
+        await asyncio.sleep(0.2) # to avoid getting blocked by the server
 
 
 
